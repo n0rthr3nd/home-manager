@@ -13,10 +13,10 @@
         <input
           matInput
           formControlName="id"
-          placeholder="Ej: DOOR_001"
+          placeholder="Ej: persiana-salon, puerta-01, ventana-cocina"
           required>
         <mat-icon matPrefix>tag</mat-icon>
-        <mat-hint>Solo letras mayúsculas, números y guión bajo</mat-hint>
+        <mat-hint>Identificador único del dispositivo (cualquier texto)</mat-hint>
         @if (deviceForm.get('id')?.invalid && deviceForm.get('id')?.touched) {
           <mat-error>{{ getErrorMessage('id') }}</mat-error>
         }

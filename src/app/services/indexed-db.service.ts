@@ -54,18 +54,64 @@ export class IndexedDBService {
   }
 
   private async loadDefaultDevices(): Promise<void> {
-    const devices = await this.getAllDevices();
-    if (devices.length === 0) {
-      console.log('Loading default devices...');
-      for (const device of DEFAULT_DEVICES) {
-        await this.addDevice(device);
-      }
-    }
+    // Ya no guardamos los dispositivos por defecto en IndexedDB
+    // Solo cargamos los dispositivos (que ahora incluirán los defaults automáticamente)
+    this.loadDevices();
   }
 
   private async loadDevices(): Promise<void> {
-    const devices = await this.getAllDevices();
-    this.devicesSubject.next(devices);
+    const userDevices = await this.getUserDevices();
+    // Fusionar dispositivos por defecto con los del usuario
+    // Los dispositivos del usuario tienen prioridad (pueden sobreescribir los default con el mismo ID)
+    const allDevices = this.mergeDevices(DEFAULT_DEVICES, userDevices);
+    this.devicesSubject.next(allDevices);
+  }
+
+  /**
+   * Fusiona dispositivos por defecto con los del usuario
+   * Si hay IDs duplicados, el dispositivo del usuario tiene prioridad
+   */
+  private mergeDevices(defaultDevices: Device[], userDevices: Device[]): Device[] {
+    const deviceMap = new Map<string, Device>();
+
+    // Primero agregamos los dispositivos por defecto
+    defaultDevices.forEach(device => {
+      deviceMap.set(device.id, device);
+    });
+
+    // Luego agregamos/sobreescribimos con los dispositivos del usuario
+    userDevices.forEach(device => {
+      deviceMap.set(device.id, device);
+    });
+
+    // Convertimos el Map a array
+    return Array.from(deviceMap.values());
+  }
+
+  /**
+   * Obtiene solo los dispositivos guardados por el usuario en IndexedDB
+   */
+  private async getUserDevices(): Promise<Device[]> {
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        // Si la DB no está lista, devolvemos array vacío
+        resolve([]);
+        return;
+      }
+
+      const transaction = this.db.transaction([this.storeName], 'readonly');
+      const store = transaction.objectStore(this.storeName);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        resolve(request.result || []);
+      };
+
+      request.onerror = () => {
+        console.error('Error getting user devices');
+        reject(request.error);
+      };
+    });
   }
 
   async addDevice(device: Device): Promise<void> {
@@ -140,32 +186,23 @@ export class IndexedDBService {
     });
   }
 
+  /**
+   * Obtiene TODOS los dispositivos (defaults + usuario)
+   */
   async getAllDevices(): Promise<Device[]> {
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject('Database not initialized');
-        return;
-      }
-
-      const transaction = this.db.transaction([this.storeName], 'readonly');
-      const store = transaction.objectStore(this.storeName);
-      const request = store.getAll();
-
-      request.onsuccess = () => {
-        resolve(request.result || []);
-      };
-
-      request.onerror = () => {
-        console.error('Error getting devices');
-        reject(request.error);
-      };
-    });
+    const userDevices = await this.getUserDevices();
+    return this.mergeDevices(DEFAULT_DEVICES, userDevices);
   }
 
+  /**
+   * Obtiene un dispositivo por ID (busca en usuario primero, luego en defaults)
+   */
   async getDevice(id: string): Promise<Device | undefined> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!this.db) {
-        reject('Database not initialized');
+        // Si la DB no está inicializada, buscar solo en defaults
+        const defaultDevice = DEFAULT_DEVICES.find(d => d.id === id);
+        resolve(defaultDevice);
         return;
       }
 
@@ -174,7 +211,14 @@ export class IndexedDBService {
       const request = store.get(id);
 
       request.onsuccess = () => {
-        resolve(request.result);
+        if (request.result) {
+          // Encontrado en dispositivos del usuario
+          resolve(request.result);
+        } else {
+          // Buscar en dispositivos por defecto
+          const defaultDevice = DEFAULT_DEVICES.find(d => d.id === id);
+          resolve(defaultDevice);
+        }
       };
 
       request.onerror = () => {

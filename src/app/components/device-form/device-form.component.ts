@@ -43,7 +43,7 @@ export class DeviceFormComponent {
     private snackBar: MatSnackBar
   ) {
     this.deviceForm = this.fb.group({
-      id: ['', [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
+      id: ['', [Validators.required]],
       description: ['', [Validators.required, Validators.minLength(3)]],
       type: [DeviceType.VENTANA, Validators.required]
     });
@@ -84,10 +84,6 @@ export class DeviceFormComponent {
 
     if (control?.hasError('minlength')) {
       return 'Mínimo 3 caracteres';
-    }
-
-    if (control?.hasError('pattern')) {
-      return 'Solo letras mayúsculas, números y guión bajo';
     }
 
     return '';
