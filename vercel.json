@@ -1,29 +1,32 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build -- --configuration production",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist/blinds-control-app/browser",
   "framework": "angular",
-  "routes": [
+  "rewrites": [
     {
-      "src": "/ngsw-worker.js",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      },
-      "dest": "/ngsw-worker.js"
-    },
-    {
-      "src": "/ngsw.json",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      },
-      "dest": "/ngsw.json"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
+    {
+      "source": "/ngsw-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/ngsw.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
     {
       "source": "/manifest.webmanifest",
       "headers": [
