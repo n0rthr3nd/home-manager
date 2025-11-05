@@ -3,5 +3,5 @@
 // usando la variable de entorno API_URL de Vercel
 export const environment = {
   production: true,
-  apiUrl: '' // Este placeholder será reemplazado en build time
+  apiUrl: '__API_URL__' // Este placeholder será reemplazado en build time
 };
