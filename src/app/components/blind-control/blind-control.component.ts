@@ -4,7 +4,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatChipsModule } from '@angular/material/chips';
 import { Device, DeviceStatus } from '../../models/device.model';
 import { BlindControlService } from '../../services/blind-control.service';
 import { Observable } from 'rxjs';
@@ -17,8 +16,7 @@ import { Observable } from 'rxjs';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressBarModule,
-    MatChipsModule
+    MatProgressBarModule
   ],
   templateUrl: './blind-control.component.html',
   styleUrl: './blind-control.component.scss'

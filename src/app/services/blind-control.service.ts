@@ -133,7 +133,8 @@ export class BlindControlService {
 
   /**
    * Simulate blind movement for demo purposes
-   * Remove this in production and replace with actual hardware integration
+   * Animation duration: 15 seconds (0-100%)
+   * Increment: 1% every 150ms = 15 seconds total
    */
   private simulateMovement(deviceId: string, direction: 'UP' | 'DOWN'): void {
     const subject = this.deviceStatusMap.get(deviceId);
@@ -150,14 +151,14 @@ export class BlindControlService {
       let newPosition = currentStatus.position;
 
       if (direction === 'UP') {
-        newPosition = Math.min(100, currentStatus.position + 5);
+        newPosition = Math.min(100, currentStatus.position + 1);
         if (newPosition === 100) {
           this.updateStatus(deviceId, { position: newPosition, status: 'STOPPED' });
           clearInterval(interval);
           return;
         }
       } else if (direction === 'DOWN') {
-        newPosition = Math.max(0, currentStatus.position - 5);
+        newPosition = Math.max(0, currentStatus.position - 1);
         if (newPosition === 0) {
           this.updateStatus(deviceId, { position: newPosition, status: 'STOPPED' });
           clearInterval(interval);
@@ -166,6 +167,6 @@ export class BlindControlService {
       }
 
       this.updateStatus(deviceId, { position: newPosition });
-    }, 200);
+    }, 150);
   }
 }

@@ -1,135 +1,210 @@
+// Variables para un diseño premium
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+$success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(102, 126, 234, 0.15);
+
 .blind-card {
-  margin: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  margin: 6px;
+  background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
+  border-radius: 16px;
+  box-shadow: $card-shadow;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: $card-shadow-hover;
+    border-color: rgba(102, 126, 234, 0.2);
+  }
+
+  ::ng-deep .mat-mdc-card-header {
+    padding: 10px 12px 8px;
   }
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   width: 100%;
 
   .device-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #1976d2;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .header-text {
+  .device-title {
     flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+    line-height: 1.3;
   }
 }
 
 mat-card-content {
-  padding-top: 20px;
+  padding: 8px 12px !important;
 }
 
 .status-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
-.position-info {
+.position-display {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  font-size: 16px;
-
-  .position-label {
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
-  }
 
   .position-value {
     font-weight: 700;
-    font-size: 24px;
-    color: #1976d2;
+    font-size: 20px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
   }
 }
 
 mat-progress-bar {
-  height: 12px;
-  border-radius: 6px;
-}
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background-color: rgba(102, 126, 234, 0.1) !important;
 
-.status-chip-container {
-  display: flex;
-  justify-content: center;
-
-  mat-chip-set {
-    display: flex;
-    gap: 8px;
+  ::ng-deep .mdc-linear-progress__bar-inner {
+    border-radius: 3px;
+    transition: all 0.3s ease;
   }
 
-  mat-chip {
-    transition: all 0.3s;
+  &.moving-up ::ng-deep .mdc-linear-progress__bar-inner {
+    background: $success-gradient !important;
+  }
 
-    mat-icon {
-      margin-right: 4px;
-    }
-
-    &.status-up {
-      background-color: #4caf50 !important;
-      color: white !important;
-    }
-
-    &.status-down {
-      background-color: #ff9800 !important;
-      color: white !important;
-    }
-
-    &.status-stopped {
-      background-color: #9e9e9e !important;
-      color: white !important;
-    }
+  &.moving-down ::ng-deep .mdc-linear-progress__bar-inner {
+    background: $secondary-gradient !important;
   }
 }
 
 .control-buttons {
   display: flex;
-  justify-content: space-around;
-  padding: 16px;
-  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px 12px;
+  gap: 10px;
 
   .control-btn {
-    flex: 1;
-    min-width: 100px;
-    font-weight: 600;
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     mat-icon {
-      margin-right: 4px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &.btn-up {
+      background: $success-gradient;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.4);
+      }
+    }
+
+    &.btn-stop {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(238, 90, 36, 0.4);
+      }
+    }
+
+    &.btn-down {
+      background: $primary-gradient;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(118, 75, 162, 0.4);
+      }
     }
   }
 }
 
-// Responsive design
+// Diseño ultra-compacto para móvil
 @media (max-width: 600px) {
   .blind-card {
-    margin: 8px;
-  }
+    margin: 4px;
+    border-radius: 12px;
 
-  .control-buttons {
-    flex-direction: column;
-    gap: 8px;
-
-    .control-btn {
-      width: 100%;
+    ::ng-deep .mat-mdc-card-header {
+      padding: 8px 10px 6px;
     }
   }
 
   .header-content {
+    gap: 8px;
+
     .device-icon {
-      font-size: 36px;
-      width: 36px;
-      height: 36px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .device-title {
+      font-size: 13px;
+    }
+  }
+
+  mat-card-content {
+    padding: 6px 10px !important;
+  }
+
+  .status-section {
+    gap: 6px;
+  }
+
+  .position-display .position-value {
+    font-size: 18px;
+  }
+
+  mat-progress-bar {
+    height: 5px;
+  }
+
+  .control-buttons {
+    padding: 6px 10px 10px;
+    gap: 8px;
+
+    .control-btn {
+      width: 44px;
+      height: 44px;
+
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
     }
   }
 }

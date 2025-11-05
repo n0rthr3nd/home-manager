@@ -2,85 +2,53 @@
   <mat-card-header>
     <div class="header-content">
       <mat-icon class="device-icon">{{ getIconForType() }}</mat-icon>
-      <div class="header-text">
-        <mat-card-title>{{ device.description }}</mat-card-title>
-        <mat-card-subtitle>{{ device.id }} - {{ device.type }}</mat-card-subtitle>
-      </div>
+      <mat-card-title class="device-title">{{ device.description }}</mat-card-title>
     </div>
   </mat-card-header>
 
   <mat-card-content>
     @if (deviceStatus$ | async; as status) {
       <div class="status-section">
-        <div class="position-info">
-          <span class="position-label">Posición:</span>
+        <div class="position-display">
           <span class="position-value">{{ status.position }}%</span>
         </div>
 
         <mat-progress-bar
           mode="determinate"
           [value]="status.position"
-          [color]="status.status === 'STOPPED' ? 'primary' : 'accent'">
+          [class.moving-up]="status.status === 'UP'"
+          [class.moving-down]="status.status === 'DOWN'">
         </mat-progress-bar>
-
-        <div class="status-chip-container">
-          <mat-chip-set>
-            <mat-chip
-              [highlighted]="status.status === 'UP'"
-              [class.status-up]="status.status === 'UP'">
-              @if (status.status === 'UP') {
-                <mat-icon>arrow_upward</mat-icon>
-              }
-              Subiendo
-            </mat-chip>
-            <mat-chip
-              [highlighted]="status.status === 'DOWN'"
-              [class.status-down]="status.status === 'DOWN'">
-              @if (status.status === 'DOWN') {
-                <mat-icon>arrow_downward</mat-icon>
-              }
-              Bajando
-            </mat-chip>
-            <mat-chip
-              [highlighted]="status.status === 'STOPPED'"
-              [class.status-stopped]="status.status === 'STOPPED'">
-              @if (status.status === 'STOPPED') {
-                <mat-icon>pause</mat-icon>
-              }
-              Detenido
-            </mat-chip>
-          </mat-chip-set>
-        </div>
       </div>
     }
   </mat-card-content>
 
   <mat-card-actions class="control-buttons">
     <button
-      mat-raised-button
+      mat-fab
       color="primary"
       (click)="moveUp()"
-      class="control-btn">
+      class="control-btn btn-up"
+      aria-label="Subir">
       <mat-icon>arrow_upward</mat-icon>
-      Subir
     </button>
 
     <button
-      mat-raised-button
+      mat-fab
       color="warn"
       (click)="stop()"
-      class="control-btn">
+      class="control-btn btn-stop"
+      aria-label="Parar">
       <mat-icon>stop</mat-icon>
-      Parar
     </button>
 
     <button
-      mat-raised-button
+      mat-fab
       color="primary"
       (click)="moveDown()"
-      class="control-btn">
+      class="control-btn btn-down"
+      aria-label="Bajar">
       <mat-icon>arrow_downward</mat-icon>
-      Bajar
     </button>
   </mat-card-actions>
 </mat-card>
