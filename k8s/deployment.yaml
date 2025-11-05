@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blinds-control-app
+  namespace: default
+  labels:
+    app: blinds-control
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blinds-control
+  template:
+    metadata:
+      labels:
+        app: blinds-control
+    spec:
+      containers:
+      - name: blinds-control
+        image: your-registry/blinds-control-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        env:
+        - name: API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: blinds-control-config
+              key: API_URL
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
