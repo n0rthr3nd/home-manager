@@ -3,5 +3,5 @@
 // usando la variable de entorno API_URL de Vercel
 export const environment = {
   production: true,
-  apiUrl: '__API_URL__' // Este placeholder será reemplazado en build time
+  API_URL: 'https://northr3nd.duckdns.org/api'
 };
