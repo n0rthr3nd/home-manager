@@ -24,7 +24,8 @@ export const DEFAULT_DEVICES: Device[] = [
   {
     id: 'ZWayVDev_zway_7-0-38',
     description: 'Ventana Ordenadores',
-    type: DeviceType.VENTANA
+    type: DeviceType.VENTANA,
+    inverted: true
   },
   {
     id: 'ZWayVDev_zway_9-0-38',
