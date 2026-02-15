@@ -1,64 +1,45 @@
-<!-- BOTÓN DE CONTROL POR VOZ -->
-<div class="voice-button-container">
-  <!-- Botón flotante principal -->
+<div class="voice-container">
+  <!-- Feedback Panel (Bottom Sheet style) -->
+  <div class="feedback-sheet" [class.visible]="voiceState.isListening || voiceState.transcript">
+    <!-- Transcript -->
+    @if (voiceState.transcript) {
+      <div class="transcript-section">
+        <div class="transcript-label">Reconocido:</div>
+        <div class="transcript-text">{{ voiceState.transcript }}</div>
+        <div class="confidence-bar">
+          <div
+            class="confidence-fill"
+            [style.width.%]="voiceState.confidence * 100"
+            [class.high]="voiceState.confidence > 0.8"
+            [class.medium]="voiceState.confidence > 0.5 && voiceState.confidence <= 0.8"
+            [class.low]="voiceState.confidence <= 0.5">
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Status Message -->
+    <div class="status-message">{{ voiceState.message }}</div>
+
+    <!-- Listening Waves -->
+    @if (voiceState.isListening) {
+      <div class="listening-waves">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+      </div>
+    }
+  </div>
+
+  <!-- FAB Button -->
   <button
-    mat-fab
-    extended
-    class="voice-button"
+    class="voice-fab"
     [class.listening]="voiceState.isListening"
     [class.processing]="voiceState.message.includes('Procesando')"
-    [matTooltip]="getTooltip()"
-    matTooltipPosition="left"
     (click)="toggleVoiceRecognition()"
-  >
+    [attr.aria-label]="voiceState.isListening ? 'Detener reconocimiento de voz' : 'Activar control por voz'">
     <mat-icon [class.pulse]="voiceState.isListening">{{ getIcon() }}</mat-icon>
-    <span class="button-text">{{ voiceState.isListening ? 'Escuchando...' : 'Voz' }}</span>
   </button>
-
-  <!-- Panel de feedback con transcripción y estado -->
-  <div class="feedback-panel" [class.visible]="voiceState.isListening || voiceState.transcript">
-    <!-- Transcripción en tiempo real -->
-    <div class="transcript-section" *ngIf="voiceState.transcript">
-      <div class="transcript-label">Reconocido:</div>
-      <div class="transcript-text">{{ voiceState.transcript }}</div>
-      <div class="confidence-bar">
-        <div
-          class="confidence-fill"
-          [style.width.%]="voiceState.confidence * 100"
-          [class.high]="voiceState.confidence > 0.8"
-          [class.medium]="voiceState.confidence > 0.5 && voiceState.confidence <= 0.8"
-          [class.low]="voiceState.confidence <= 0.5"
-        ></div>
-      </div>
-    </div>
-
-    <!-- Mensaje de estado -->
-    <div class="status-section">
-      <div class="status-message">{{ voiceState.message }}</div>
-    </div>
-
-    <!-- Indicador de escucha activa -->
-    <div class="listening-indicator" *ngIf="voiceState.isListening">
-      <div class="wave"></div>
-      <div class="wave"></div>
-      <div class="wave"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Ayuda de comandos (opcional, se puede mostrar con un toggle) -->
-<div class="voice-help" *ngIf="false">
-  <h3>Comandos disponibles:</h3>
-  <ul>
-    <li><strong>Acciones:</strong> subir, bajar, cerrar, abrir, parar, stop</li>
-    <li><strong>Elementos:</strong> ventana, puerta, persiana</li>
-    <li><strong>Estancias:</strong> salón, principal, ordenadores, jaume, edu</li>
-  </ul>
-  <p><strong>Ejemplos:</strong></p>
-  <ul>
-    <li>"Subir ventana salón"</li>
-    <li>"Cerrar puerta principal"</li>
-    <li>"Parar"</li>
-    <li>"Abrir ventanas ordenadores"</li>
-  </ul>
 </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,7 +6,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Device, DeviceType } from '../../models/device.model';
 import { IndexedDBService } from '../../services/indexed-db.service';
@@ -23,12 +22,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule,
     MatSnackBarModule,
     MatCheckboxModule
   ],
   templateUrl: './device-form.component.html',
-  styleUrl: './device-form.component.scss'
+  styleUrl: './device-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DeviceFormComponent {
   @Output() deviceAdded = new EventEmitter<Device>();

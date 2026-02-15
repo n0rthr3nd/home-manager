@@ -1,210 +1,235 @@
-// Variables para un diseño premium
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-$success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-$card-shadow-hover: 0 8px 24px rgba(102, 126, 234, 0.15);
+.device-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  transition: border-color var(--transition-base);
 
-.blind-card {
-  margin: 6px;
-  background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
-  border-radius: 16px;
-  box-shadow: $card-shadow;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-
-  &:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: $card-shadow-hover;
-    border-color: rgba(102, 126, 234, 0.2);
+  &.moving-up {
+    border-color: rgba(79, 172, 254, 0.25);
   }
 
-  ::ng-deep .mat-mdc-card-header {
-    padding: 10px 12px 8px;
+  &.moving-down {
+    border-color: rgba(124, 92, 252, 0.25);
   }
 }
 
-.header-content {
+/* ===== Card Header ===== */
+.card-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
 
-  .device-icon {
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+.device-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
 
-  .device-title {
-    flex: 1;
-    font-size: 14px;
-    font-weight: 600;
-    color: #2d3748;
-    margin: 0;
-    line-height: 1.3;
+.device-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card-elevated);
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    color: var(--accent-blue);
   }
 }
 
-mat-card-content {
-  padding: 8px 12px !important;
-}
-
-.status-section {
+.device-meta {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  min-width: 0;
 }
 
-.position-display {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.device-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .position-value {
-    font-weight: 700;
-    font-size: 20px;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
+.device-type {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+
+  &.up {
+    background: var(--accent-blue);
+    box-shadow: 0 0 8px rgba(79, 172, 254, 0.5);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  &.down {
+    background: var(--accent-purple);
+    box-shadow: 0 0 8px rgba(124, 92, 252, 0.5);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  &.stopped {
+    background: var(--text-muted);
   }
 }
 
-mat-progress-bar {
-  height: 6px;
-  border-radius: 3px;
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== Position Display ===== */
+.position-section {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.position-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  transition: color var(--transition-fast);
+  font-variant-numeric: tabular-nums;
+
+  &.up {
+    color: var(--accent-blue);
+  }
+
+  &.down {
+    color: var(--accent-purple);
+  }
+}
+
+.position-unit {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ===== Progress Bar ===== */
+.progress-wrap {
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+
+.device-progress {
+  height: 8px !important;
+  border-radius: 4px !important;
   overflow: hidden;
-  background-color: rgba(102, 126, 234, 0.1) !important;
+
+  ::ng-deep .mdc-linear-progress__buffer-bar {
+    background-color: var(--bg-card-elevated) !important;
+  }
 
   ::ng-deep .mdc-linear-progress__bar-inner {
-    border-radius: 3px;
-    transition: all 0.3s ease;
+    border-radius: 4px;
+    transition: all 0.15s linear;
   }
 
   &.moving-up ::ng-deep .mdc-linear-progress__bar-inner {
-    background: $success-gradient !important;
+    background: linear-gradient(90deg, var(--accent-blue), #00f2fe) !important;
+    border-color: transparent !important;
   }
 
   &.moving-down ::ng-deep .mdc-linear-progress__bar-inner {
-    background: $secondary-gradient !important;
+    background: linear-gradient(90deg, var(--accent-purple), #f093fb) !important;
+    border-color: transparent !important;
   }
 }
 
-.control-buttons {
+/* ===== Control Buttons ===== */
+.controls {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.ctrl-btn {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 8px 12px 12px;
-  gap: 10px;
+  gap: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  padding: 0;
 
-  .control-btn {
-    width: 48px;
-    height: 48px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  mat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 28px;
+    color: #fff;
+    transition: transform var(--transition-fast),
+                box-shadow var(--transition-fast),
+                filter var(--transition-fast);
+  }
 
-    mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
-    }
+  .ctrl-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-    &:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    &.btn-up {
-      background: $success-gradient;
-
-      &:hover {
-        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.4);
-      }
-    }
-
-    &.btn-stop {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-
-      &:hover {
-        box-shadow: 0 4px 16px rgba(238, 90, 36, 0.4);
-      }
-    }
-
-    &.btn-down {
-      background: $primary-gradient;
-
-      &:hover {
-        box-shadow: 0 4px 16px rgba(118, 75, 162, 0.4);
-      }
-    }
+  &:active mat-icon {
+    transform: scale(0.88);
+    filter: brightness(0.85);
   }
 }
 
-// Diseño ultra-compacto para móvil
-@media (max-width: 600px) {
-  .blind-card {
-    margin: 4px;
-    border-radius: 12px;
+.ctrl-up mat-icon {
+  background: linear-gradient(135deg, var(--accent-blue), #00c6fb);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.35);
+}
 
-    ::ng-deep .mat-mdc-card-header {
-      padding: 8px 10px 6px;
-    }
+.ctrl-stop mat-icon {
+  background: linear-gradient(135deg, var(--accent-red), #ee5a24);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.35);
+}
+
+.ctrl-down mat-icon {
+  background: linear-gradient(135deg, var(--accent-purple), #a855f7);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
+}
+
+/* ===== Tablet+ ===== */
+@media (min-width: 600px) {
+  .device-card {
+    padding: 20px;
   }
 
-  .header-content {
-    gap: 8px;
-
-    .device-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
-    }
-
-    .device-title {
-      font-size: 13px;
-    }
-  }
-
-  mat-card-content {
-    padding: 6px 10px !important;
-  }
-
-  .status-section {
-    gap: 6px;
-  }
-
-  .position-display .position-value {
-    font-size: 18px;
-  }
-
-  mat-progress-bar {
-    height: 5px;
-  }
-
-  .control-buttons {
-    padding: 6px 10px 10px;
-    gap: 8px;
-
-    .control-btn {
-      width: 44px;
-      height: 44px;
-
-      mat-icon {
-        font-size: 22px;
-        width: 22px;
-        height: 22px;
-      }
-    }
+  .controls {
+    gap: 28px;
   }
 }

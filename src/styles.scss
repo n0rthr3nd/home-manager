@@ -1,7 +1,33 @@
-/* Global styles optimized for premium design */
+/* ===== Design System Custom Properties ===== */
+:root {
+  --bg-primary: #0f1117;
+  --bg-card: #1a1d27;
+  --bg-card-elevated: #222635;
+  --bg-input: #2a2e3b;
+  --text-primary: #f0f2f5;
+  --text-secondary: #8b92a5;
+  --text-muted: #5a6178;
+  --accent-blue: #4facfe;
+  --accent-purple: #7c5cfc;
+  --accent-red: #ff6b6b;
+  --accent-green: #34d399;
+  --accent-orange: #fbbf24;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --glass-bg: rgba(26, 29, 39, 0.85);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+}
 
-* {
+/* ===== Global Reset ===== */
+*, *::before, *::after {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
@@ -11,68 +37,114 @@ html, body {
 }
 
 body {
-  margin: 0;
-  font-family: 'Inter', 'Roboto', "Helvetica Neue", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-attachment: fixed;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.5;
+  overscroll-behavior: none;
 }
 
-/* PWA safe area handling */
+/* ===== PWA Safe Area ===== */
 body {
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
-/* Premium scrollbar styling */
+/* ===== Scrollbar (Dark Theme) ===== */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
-  transition: all 0.3s ease;
+  background: var(--text-muted);
+  border-radius: 2px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  box-shadow: 0 0 6px rgba(102, 126, 234, 0.5);
+/* ===== Angular Material Dark Overrides ===== */
+.mat-mdc-card {
+  --mdc-elevated-card-container-color: var(--bg-card);
 }
 
-/* Voice Control Snackbar Styles */
+.mat-mdc-snack-bar-container {
+  border-radius: var(--radius-md) !important;
+}
+
+/* ===== Snackbar Styles ===== */
 .snackbar-success {
-  background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%) !important;
-  color: white !important;
-  font-weight: 500;
+  --mdc-snackbar-container-color: #166534 !important;
+  --mdc-snackbar-supporting-text-color: #f0fdf4 !important;
 
   .mat-mdc-button {
-    color: white !important;
+    color: var(--accent-green) !important;
   }
 }
 
 .snackbar-error {
-  background: linear-gradient(135deg, #F44336 0%, #E91E63 100%) !important;
-  color: white !important;
-  font-weight: 500;
+  --mdc-snackbar-container-color: #991b1b !important;
+  --mdc-snackbar-supporting-text-color: #fef2f2 !important;
 
   .mat-mdc-button {
-    color: white !important;
+    color: var(--accent-red) !important;
   }
 }
 
 .snackbar-warning {
-  background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%) !important;
-  color: white !important;
-  font-weight: 500;
+  --mdc-snackbar-container-color: #92400e !important;
+  --mdc-snackbar-supporting-text-color: #fffbeb !important;
 
   .mat-mdc-button {
-    color: white !important;
+    color: var(--accent-orange) !important;
   }
+}
+
+/* ===== Form Field Dark Overrides ===== */
+.mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: var(--bg-input);
+  --mdc-outlined-text-field-outline-color: var(--border-subtle);
+  --mdc-outlined-text-field-focus-outline-color: var(--accent-blue);
+  --mdc-outlined-text-field-hover-outline-color: rgba(255, 255, 255, 0.15);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-focus-label-text-color: var(--accent-blue);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
+  --mdc-outlined-text-field-caret-color: var(--accent-blue);
+  --mdc-outlined-text-field-container-shape: var(--radius-md);
+  --mdc-outlined-text-field-error-outline-color: var(--accent-red);
+  --mdc-outlined-text-field-error-focus-outline-color: var(--accent-red);
+  --mdc-outlined-text-field-error-label-text-color: var(--accent-red);
+}
+
+.mat-mdc-form-field-hint {
+  color: var(--text-muted) !important;
+}
+
+.mat-mdc-select {
+  --mat-select-trigger-text-color: var(--text-primary);
+  --mat-select-panel-background-color: var(--bg-card-elevated);
+  --mat-select-enabled-arrow-color: var(--text-secondary);
+}
+
+.mat-mdc-option {
+  --mat-option-label-text-color: var(--text-primary);
+  --mat-option-hover-state-layer-color: rgba(255, 255, 255, 0.05);
+  --mat-option-selected-state-layer-color: rgba(79, 172, 254, 0.1);
+}
+
+/* ===== Checkbox Dark Override ===== */
+.mat-mdc-checkbox {
+  --mdc-checkbox-unselected-icon-color: var(--text-muted);
+  --mdc-checkbox-selected-icon-color: var(--accent-blue);
+  --mdc-checkbox-selected-checkmark-color: #fff;
+  --mdc-checkbox-label-text-color: var(--text-primary);
+}
+
+/* ===== Mat Toolbar Dark Override ===== */
+.mat-toolbar {
+  --mat-toolbar-container-background-color: transparent;
+  --mat-toolbar-container-text-color: var(--text-primary);
 }

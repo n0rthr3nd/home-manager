@@ -1,26 +1,33 @@
 <div class="app-container">
   <!-- Header -->
-  <mat-toolbar color="primary" class="app-toolbar">
-    <mat-icon class="toolbar-icon">window</mat-icon>
-    <span class="toolbar-title">{{ title }}</span>
-    <span class="spacer"></span>
-    <button mat-icon-button (click)="formExpanded = !formExpanded">
-      <mat-icon>{{ formExpanded ? 'expand_less' : 'add' }}</mat-icon>
-    </button>
-  </mat-toolbar>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-brand">
+        <mat-icon class="brand-icon">home</mat-icon>
+        <span class="brand-title">{{ title }}</span>
+      </div>
+      <button
+        class="add-btn"
+        (click)="formExpanded = !formExpanded"
+        [attr.aria-label]="formExpanded ? 'Cerrar formulario' : 'Agregar dispositivo'"
+        [class.active]="formExpanded">
+        <mat-icon>{{ formExpanded ? 'close' : 'add' }}</mat-icon>
+      </button>
+    </div>
+  </header>
 
   <!-- Main Content -->
-  <div class="main-content">
-    <!-- Device Form (Collapsible) -->
-    <mat-expansion-panel
-      [(expanded)]="formExpanded"
-      class="form-panel">
-      <app-device-form (deviceAdded)="formExpanded = false"></app-device-form>
-    </mat-expansion-panel>
+  <main class="main-content">
+    <!-- Device Form (Slide Down) -->
+    <div class="form-slide" [class.expanded]="formExpanded">
+      <div class="form-slide-inner">
+        <app-device-form (deviceAdded)="formExpanded = false"></app-device-form>
+      </div>
+    </div>
 
     <!-- Device List -->
     <app-device-list></app-device-list>
-  </div>
+  </main>
 </div>
 
 <!-- Voice Control Button (Floating) -->

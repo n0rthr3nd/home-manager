@@ -1,54 +1,61 @@
-<mat-card class="blind-card">
-  <mat-card-header>
-    <div class="header-content">
-      <mat-icon class="device-icon">{{ getIconForType() }}</mat-icon>
-      <mat-card-title class="device-title">{{ device.description }}</mat-card-title>
-    </div>
-  </mat-card-header>
-
-  <mat-card-content>
-    @if (deviceStatus$ | async; as status) {
-      <div class="status-section">
-        <div class="position-display">
-          <span class="position-value">{{ status.position }}%</span>
+@if (deviceStatus$ | async; as status) {
+  <div class="device-card" [class.moving-up]="status.status === 'UP'" [class.moving-down]="status.status === 'DOWN'">
+    <!-- Header: Icon + Name + Status dot -->
+    <div class="card-header">
+      <div class="device-info">
+        <div class="device-icon-wrap">
+          <mat-icon>{{ getIconForType() }}</mat-icon>
         </div>
-
-        <mat-progress-bar
-          mode="determinate"
-          [value]="status.position"
-          [class.moving-up]="status.status === 'UP'"
-          [class.moving-down]="status.status === 'DOWN'">
-        </mat-progress-bar>
+        <div class="device-meta">
+          <span class="device-name">{{ device.description }}</span>
+          <span class="device-type">{{ device.type === 'PUERTA' ? 'Puerta' : 'Ventana' }}</span>
+        </div>
       </div>
-    }
-  </mat-card-content>
+      <div class="status-dot"
+           [class.up]="status.status === 'UP'"
+           [class.down]="status.status === 'DOWN'"
+           [class.stopped]="status.status === 'STOPPED'"
+           [attr.aria-label]="'Estado: ' + status.status">
+      </div>
+    </div>
 
-  <mat-card-actions class="control-buttons">
-    <button
-      mat-fab
-      color="primary"
-      (click)="moveUp()"
-      class="control-btn btn-up"
-      aria-label="Subir">
-      <mat-icon>arrow_upward</mat-icon>
-    </button>
+    <!-- Position Display -->
+    <div class="position-section">
+      <span class="position-value"
+            [class.up]="status.status === 'UP'"
+            [class.down]="status.status === 'DOWN'">
+        {{ status.position }}
+      </span>
+      <span class="position-unit">%</span>
+    </div>
 
-    <button
-      mat-fab
-      color="warn"
-      (click)="stop()"
-      class="control-btn btn-stop"
-      aria-label="Parar">
-      <mat-icon>stop</mat-icon>
-    </button>
+    <!-- Progress Bar -->
+    <div class="progress-wrap">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="status.position"
+        class="device-progress"
+        [class.moving-up]="status.status === 'UP'"
+        [class.moving-down]="status.status === 'DOWN'">
+      </mat-progress-bar>
+    </div>
 
-    <button
-      mat-fab
-      color="primary"
-      (click)="moveDown()"
-      class="control-btn btn-down"
-      aria-label="Bajar">
-      <mat-icon>arrow_downward</mat-icon>
-    </button>
-  </mat-card-actions>
-</mat-card>
+    <!-- Control Buttons -->
+    <div class="controls">
+      <button class="ctrl-btn ctrl-up" (click)="moveUp()" aria-label="Subir persiana">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+        <span class="ctrl-label">Subir</span>
+      </button>
+
+      <button class="ctrl-btn ctrl-stop" (click)="stop()" aria-label="Parar persiana">
+        <mat-icon>stop</mat-icon>
+        <span class="ctrl-label">Parar</span>
+      </button>
+
+      <button class="ctrl-btn ctrl-down" (click)="moveDown()" aria-label="Bajar persiana">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+        <span class="ctrl-label">Bajar</span>
+      </button>
+    </div>
+  </div>
+}
