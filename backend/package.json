@@ -1,0 +1,16 @@
+{
+  "name": "blinds-control-backend",
+  "version": "1.0.0",
+  "description": "BFF (Backend For Frontend) para blinds-control-app. Pasarela hacia Z-Way API.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "private": true,
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "morgan": "^1.10.0"
+  }
+}

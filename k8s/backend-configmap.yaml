@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blinds-backend-config
+  namespace: default
+  labels:
+    app: blinds-backend
+data:
+  # Host del controlador Z-Way (IP interna del cluster o red local)
+  ZWAY_HOST: "192.168.1.109"
+  # Puerto del API Z-Way
+  ZWAY_PORT: "8083"
+  # Protocolo (http o https)
+  ZWAY_PROTOCOL: "http"
+  # Puerto del backend
+  PORT: "3000"
+  # Origenes CORS permitidos
+  CORS_ORIGIN: "https://northr3nd.duckdns.org"

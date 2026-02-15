@@ -1,13 +1,19 @@
 ---
+# =============================================================================
+# Frontend - ConfigMap
+# =============================================================================
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: blinds-control-config
   namespace: default
 data:
-  # API_URL configurada para el backend IoT (sin /api al final, lo añade el código)
+  # API_URL apunta al propio dominio; el ingress enruta /api al backend BFF
   API_URL: "https://northr3nd.duckdns.org"
 ---
+# =============================================================================
+# Frontend - Deployment
+# =============================================================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -62,6 +68,9 @@ spec:
           timeoutSeconds: 3
           failureThreshold: 3
 ---
+# =============================================================================
+# Frontend - Service
+# =============================================================================
 apiVersion: v1
 kind: Service
 metadata:
@@ -80,6 +89,126 @@ spec:
     targetPort: 80
   sessionAffinity: ClientIP
 ---
-# NOTA: El Ingress "blinds-control" ya existe y gestiona el routing
-# No es necesario crear otro Ingress aquí
-# El servicio home-service también ya existe en el cluster
+# =============================================================================
+# Backend BFF - ConfigMap
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blinds-backend-config
+  namespace: default
+  labels:
+    app: blinds-backend
+data:
+  ZWAY_HOST: "192.168.1.109"
+  ZWAY_PORT: "8083"
+  ZWAY_PROTOCOL: "http"
+  PORT: "3000"
+  CORS_ORIGIN: "https://northr3nd.duckdns.org"
+---
+# =============================================================================
+# Backend BFF - Deployment
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blinds-backend
+  namespace: default
+  labels:
+    app: blinds-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blinds-backend
+  template:
+    metadata:
+      labels:
+        app: blinds-backend
+    spec:
+      containers:
+      - name: blinds-backend
+        image: localhost:5000/blinds-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        env:
+        - name: ZWAY_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: blinds-backend-config
+              key: ZWAY_HOST
+        - name: ZWAY_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: blinds-backend-config
+              key: ZWAY_PORT
+        - name: ZWAY_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: blinds-backend-config
+              key: ZWAY_PROTOCOL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: blinds-backend-config
+              key: PORT
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: blinds-backend-config
+              key: CORS_ORIGIN
+        - name: ZWAY_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: blinds-backend-secret
+              key: ZWAY_TOKEN
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+# =============================================================================
+# Backend BFF - Service
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: blinds-backend-service
+  namespace: default
+  labels:
+    app: blinds-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: blinds-backend
+  ports:
+  - name: http
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+---
+# NOTA: El Ingress "home-manager-ingress" y el Secret "blinds-backend-secret"
+# se gestionan por separado. Ver:
+#   - k8s/ingress.yaml
+#   - k8s/backend-secret.yaml (crear con kubectl create secret)
