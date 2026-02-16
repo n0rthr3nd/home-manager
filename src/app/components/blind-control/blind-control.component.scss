@@ -2,7 +2,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 2px 16px;
   transition: border-color var(--transition-base);
 
   &.moving-up {
@@ -80,6 +80,7 @@
     box-shadow: 0 0 8px rgba(79, 172, 254, 0.5);
     animation: pulse-dot 1.5s ease-in-out infinite;
   }
+
 
   &.down {
     background: var(--accent-purple);
@@ -234,7 +235,7 @@
 /* ===== Tablet+ ===== */
 @media (min-width: 600px) {
   .device-card {
-    padding: 20px;
+    padding: 2px 20px;
   }
 
   .controls {
