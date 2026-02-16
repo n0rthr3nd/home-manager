@@ -93,13 +93,21 @@
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ===== Position Display ===== */
 .position-section {
-  display: flex;
+  /*display: flex;*/
+  display: none;
   align-items: baseline;
   justify-content: center;
   gap: 2px;
@@ -190,8 +198,8 @@
     font-size: 28px;
     color: #fff;
     transition: transform var(--transition-fast),
-                box-shadow var(--transition-fast),
-                filter var(--transition-fast);
+      box-shadow var(--transition-fast),
+      filter var(--transition-fast);
   }
 
   .ctrl-label {

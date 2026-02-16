@@ -1,50 +1,33 @@
 <div class="device-list-container">
   @if (groupedDevices$ | async; as grouped) {
-    @if (grouped.ventanas.length === 0 && grouped.puertas.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon-wrap">
-          <mat-icon>devices</mat-icon>
-        </div>
-        <h2>No hay dispositivos</h2>
-        <p>Pulsa el botón <strong>+</strong> para agregar tu primer dispositivo</p>
-      </div>
-    } @else {
-      <!-- Ventanas Section -->
-      @if (grouped.ventanas.length > 0) {
-        <section class="device-section">
-          <div class="section-header">
-            <mat-icon>window</mat-icon>
-            <span class="section-title">Ventanas</span>
-            <span class="section-count">{{ grouped.ventanas.length }}</span>
-          </div>
-          <div class="devices-stack">
-            @for (device of grouped.ventanas; track device.id) {
-              <app-blind-control [device]="device"></app-blind-control>
-            }
-          </div>
-        </section>
-      }
-
-      <!-- Puertas Section -->
-      @if (grouped.puertas.length > 0) {
-        <section class="device-section">
-          <div class="section-header">
-            <mat-icon>door_sliding</mat-icon>
-            <span class="section-title">Puertas</span>
-            <span class="section-count">{{ grouped.puertas.length }}</span>
-          </div>
-          <div class="devices-stack">
-            @for (device of grouped.puertas; track device.id) {
-              <app-blind-control [device]="device"></app-blind-control>
-            }
-          </div>
-        </section>
-      }
-    }
-  } @else {
-    <div class="loading-state">
-      <mat-spinner diameter="36"></mat-spinner>
-      <p>Cargando dispositivos...</p>
+  @if (grouped.length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon-wrap">
+      <mat-icon>devices</mat-icon>
     </div>
+    <h2>No hay dispositivos</h2>
+    <p>Pulsa el botón <strong>+</strong> para agregar tu primer dispositivo</p>
+  </div>
+  } @else {
+  @for (group of grouped; track group.name) {
+  <section class="device-section">
+    <div class="section-header">
+      <mat-icon>meeting_room</mat-icon>
+      <span class="section-title">{{ group.name }}</span>
+      <span class="section-count">{{ group.devices.length }}</span>
+    </div>
+    <div class="devices-stack">
+      @for (device of group.devices; track device.id) {
+      <app-blind-control [device]="device"></app-blind-control>
+      }
+    </div>
+  </section>
+  }
+  }
+  } @else {
+  <div class="loading-state">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Cargando dispositivos...</p>
+  </div>
   }
 </div>
