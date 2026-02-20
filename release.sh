@@ -109,7 +109,7 @@ print_info "━━━━━━━━━━━━━━━━━━━━━━�
 print_info "Plan de release:"
 print_info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  1. Actualizar VERSION: $CURRENT_VERSION -> $NEW_VERSION"
-echo "  2. Actualizar deployment.yaml: ghcr.io/3kn4ls/${IMAGE_NAME}:v${NEW_VERSION}"
+echo "  2. Actualizar deployment.yaml: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}"
 echo "  3. Commit y push a GitHub"
 echo "  4. GitHub Actions: build multi-arch (~5 min)"
 echo "  5. Push a GHCR (GitHub Container Registry)"
@@ -128,10 +128,10 @@ echo "$NEW_VERSION" > "$VERSION_FILE"
 
 # 2. Actualizar deployment.yaml
 print_info "Paso 2/3: Actualizando deployment.yaml..."
-sed -i "s|image: ghcr.io/3kn4ls/${IMAGE_NAME}:v.*|image: ghcr.io/3kn4ls/${IMAGE_NAME}:v${NEW_VERSION}|g" "$DEPLOYMENT_FILE"
+sed -i "s|image: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v.*|image: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}|g" "$DEPLOYMENT_FILE"
 
 # Verificar el cambio
-if grep -q "image: ghcr.io/3kn4ls/${IMAGE_NAME}:v${NEW_VERSION}" "$DEPLOYMENT_FILE"; then
+if grep -q "image: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}" "$DEPLOYMENT_FILE"; then
     print_info "✓ Deployment actualizado a v${NEW_VERSION}"
 else
     print_error "Error al actualizar deployment.yaml"
@@ -156,7 +156,7 @@ if [ $? -eq 0 ]; then
     print_success "✅ Release v${NEW_VERSION} iniciado!"
     print_success "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    print_info "📦 Imagen: ghcr.io/3kn4ls/${IMAGE_NAME}:v${NEW_VERSION}"
+    print_info "📦 Imagen: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}"
     print_info "🔄 Commit: $(git rev-parse --short HEAD)"
     print_info "📝 Mensaje: ${COMMIT_MESSAGE}"
     echo ""
@@ -164,7 +164,7 @@ if [ $? -eq 0 ]; then
     print_warning "   Esto tomará ~5-6 minutos"
     echo ""
     print_info "📊 Monitorear el progreso:"
-    print_info "   GitHub Actions: https://github.com/3kn4ls/home-manager/actions"
+    print_info "   GitHub Actions: https://github.com/n0rthr3nd/home-manager/actions"
     print_info "   ArgoCD: https://northr3nd.duckdns.org/argocd"
     echo ""
     print_info "🔍 Ver estado local:"
