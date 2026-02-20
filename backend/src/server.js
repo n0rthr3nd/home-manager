@@ -83,7 +83,7 @@ app.get('/api/devices/:deviceId/command/:command', (req, res) => {
       method: 'GET',
       headers: {
         accept: 'application/json, text/plain, */*',
-        zwaysession: ZWAY_TOKEN,
+        ZWAYSession: ZWAY_TOKEN,
       },
       timeout: 10000,
     },
