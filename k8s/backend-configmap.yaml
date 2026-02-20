@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: blinds-backend-config
-  namespace: default
+  namespace: home-manager
   labels:
     app: blinds-backend
 data:

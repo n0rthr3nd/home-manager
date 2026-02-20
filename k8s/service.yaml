@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: blinds-control-service
-  namespace: default
+  namespace: home-manager
   labels:
     app: blinds-control
 spec:

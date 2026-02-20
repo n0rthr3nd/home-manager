@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: blinds-control-config
-  namespace: default
+  namespace: home-manager
 data:
   # API_URL configurada para el backend IoT (sin /api al final, lo añade el código)
   API_URL: "https://northr3nd.duckdns.org"

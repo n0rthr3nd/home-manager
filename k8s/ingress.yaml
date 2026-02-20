@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: home-manager-ingress
-  namespace: default
+  namespace: home-manager
   annotations:
     # Configuración para k3s traefik
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -40,7 +40,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: strip-api-prefix
-  namespace: default
+  namespace: home-manager
 spec:
   stripPrefix:
     prefixes:
