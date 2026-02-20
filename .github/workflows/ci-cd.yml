@@ -99,7 +99,7 @@ jobs:
           curl -k -s -X POST --connect-timeout 10 --max-time 20 
             -H "Authorization: Bearer ${ARGOCD_TOKEN}" 
             -H "Content-Type: application/json" 
-            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" || echo "ArgoCD no disponible" 
-            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}'
+            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}' 
+            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" || echo "ArgoCD no disponible"
           
-          echo "Sincronización iniciada."
+          echo "Paso de despliegue finalizado."
