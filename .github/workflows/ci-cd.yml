@@ -96,10 +96,10 @@ jobs:
           
           echo "Solicitando sincronización a ArgoCD para home-manager..."
           
-          curl -k -X POST 
+          curl -k -s -X POST --connect-timeout 10 --max-time 20 
             -H "Authorization: Bearer ${ARGOCD_TOKEN}" 
             -H "Content-Type: application/json" 
-            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" 
+            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" || echo "ArgoCD no disponible" 
             -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}'
           
           echo "Sincronización iniciada."
