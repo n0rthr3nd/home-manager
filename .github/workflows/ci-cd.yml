@@ -49,7 +49,7 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           
@@ -96,10 +96,12 @@ jobs:
           
           echo "Solicitando sincronización a ArgoCD para home-manager..."
           
-          curl -k -s -X POST --connect-timeout 10 --max-time 20 
+          curl -k -X POST 
+            --connect-timeout 10 
+            --max-time 20 
             -H "Authorization: Bearer ${ARGOCD_TOKEN}" 
             -H "Content-Type: application/json" 
-            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}' 
-            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" || echo "ArgoCD no disponible"
+            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" 
+            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}' || echo "ArgoCD API no disponible, el Image Updater se encargará."
           
           echo "Paso de despliegue finalizado."
