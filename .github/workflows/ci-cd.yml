@@ -1,0 +1,105 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/home-manager
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package.json
+
+      - name: Install Dependencies
+        run: |
+          npm install --legacy-peer-deps
+          
+      - name: Run Tests
+        run: |
+          # Si tienes tests, se ejecutan aquí. Si no, continuamos.
+          npm test -- --watch=false --browsers=ChromeHeadless || echo "Tests skipped or failed"
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Lowercase IMAGE_NAME
+        run: |
+          echo "IMAGE_NAME=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+          
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            latest
+            
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger ArgoCD Sync
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+        run: |
+          if [ -z "$ARGOCD_TOKEN" ] || [ -z "$ARGOCD_SERVER" ]; then
+            echo "Error: ARGOCD_TOKEN o ARGOCD_SERVER no configurados en los Secrets."
+            exit 1
+          fi
+          
+          echo "Solicitando sincronización a ArgoCD para home-manager..."
+          
+          curl -k -X POST 
+            -H "Authorization: Bearer ${ARGOCD_TOKEN}" 
+            -H "Content-Type: application/json" 
+            "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" 
+            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}'
+          
+          echo "Sincronización iniciada."

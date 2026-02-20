@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blinds-control-app
-  namespace: default
+  namespace: home-manager
   labels:
     app: blinds-control
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: blinds-control
-        image: ghcr.io/3kn4ls/blinds-control-app:v1.0.0
+        image: ghcr.io/n0rthr3nd/home-manager:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
