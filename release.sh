@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de release con versionado para ArgoCD
+# Script de release con versionado para ArgoCD (Frontend + Backend)
 # Uso: ./release.sh [patch|minor|major] "mensaje del commit"
 
 set -e
@@ -21,9 +21,12 @@ BLUE='\033[0;34m'
 print_success() { echo -e "${BLUE}[SUCCESS]${NC} $1"; }
 
 # Variables
-IMAGE_NAME="blinds-control-app"
+FRONTEND_IMAGE="home-manager"
+BACKEND_IMAGE="home-manager-backend"
 DEPLOYMENT_FILE="k8s/deployment.yaml"
+BACKEND_DEPLOYMENT_FILE="k8s/backend-deployment.yaml"
 VERSION_FILE="VERSION"
+REGISTRY_USER="n0rthr3nd"
 
 # Leer versión actual
 if [ ! -f "$VERSION_FILE" ]; then
@@ -74,15 +77,6 @@ if [[ ! "$VERSION_TYPE" =~ ^(patch|minor|major)$ ]]; then
     echo ""
     echo "Uso: $0 [patch|minor|major] \"mensaje del commit\""
     echo ""
-    echo "Versionado semántico (MAJOR.MINOR.PATCH):"
-    echo "  patch  - Correcciones de bugs (1.0.0 -> 1.0.1)"
-    echo "  minor  - Nueva funcionalidad compatible (1.0.0 -> 1.1.0)"
-    echo "  major  - Cambios incompatibles (1.0.0 -> 2.0.0)"
-    echo ""
-    echo "Ejemplos:"
-    echo "  $0 patch \"Fix button alignment\""
-    echo "  $0 minor \"Add dark mode feature\""
-    echo "  $0 major \"Complete redesign\""
     exit 1
 fi
 
@@ -109,11 +103,12 @@ print_info "━━━━━━━━━━━━━━━━━━━━━━�
 print_info "Plan de release:"
 print_info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  1. Actualizar VERSION: $CURRENT_VERSION -> $NEW_VERSION"
-echo "  2. Actualizar deployment.yaml: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}"
-echo "  3. Commit y push a GitHub"
-echo "  4. GitHub Actions: build multi-arch (~5 min)"
-echo "  5. Push a GHCR (GitHub Container Registry)"
-echo "  6. ArgoCD sync automático"
+echo "  2. Actualizar Frontend Deployment: ghcr.io/${REGISTRY_USER}/${FRONTEND_IMAGE}:v${NEW_VERSION}"
+echo "  3. Actualizar Backend Deployment: ghcr.io/${REGISTRY_USER}/${BACKEND_IMAGE}:v${NEW_VERSION}"
+echo "  4. Commit y tag v${NEW_VERSION}"
+echo "  5. Push a GitHub (main + tags)"
+echo "  6. GitHub Actions: build multi-arch (Front + Back)"
+echo "  7. ArgoCD sync automático"
 echo ""
 read -p "¿Proceder? (y/n) " -n 1 -r
 echo
@@ -123,32 +118,43 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 # 1. Actualizar archivo VERSION
-print_info "Paso 1/3: Actualizando VERSION..."
+print_info "Paso 1/5: Actualizando VERSION..."
 echo "$NEW_VERSION" > "$VERSION_FILE"
 
-# 2. Actualizar deployment.yaml
-print_info "Paso 2/3: Actualizando deployment.yaml..."
-sed -i "s|image: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v.*|image: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}|g" "$DEPLOYMENT_FILE"
+# 2. Actualizar deployment.yaml (Frontend)
+print_info "Paso 2/5: Actualizando Frontend Deployment..."
+sed -i "s|image: ghcr.io/${REGISTRY_USER}/${FRONTEND_IMAGE}:v.*|image: ghcr.io/${REGISTRY_USER}/${FRONTEND_IMAGE}:v${NEW_VERSION}|g" "$DEPLOYMENT_FILE"
 
-# Verificar el cambio
-if grep -q "image: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}" "$DEPLOYMENT_FILE"; then
-    print_info "✓ Deployment actualizado a v${NEW_VERSION}"
+# 3. Actualizar backend-deployment.yaml (Backend)
+print_info "Paso 3/5: Actualizando Backend Deployment..."
+sed -i "s|image: ghcr.io/${REGISTRY_USER}/${BACKEND_IMAGE}:v.*|image: ghcr.io/${REGISTRY_USER}/${BACKEND_IMAGE}:v${NEW_VERSION}|g" "$BACKEND_DEPLOYMENT_FILE"
+
+# Verificar los cambios
+if grep -q "image: ghcr.io/${REGISTRY_USER}/${FRONTEND_IMAGE}:v${NEW_VERSION}" "$DEPLOYMENT_FILE" && \
+   grep -q "image: ghcr.io/${REGISTRY_USER}/${BACKEND_IMAGE}:v${NEW_VERSION}" "$BACKEND_DEPLOYMENT_FILE"; then
+    print_info "✓ Deployments actualizados a v${NEW_VERSION}"
 else
-    print_error "Error al actualizar deployment.yaml"
+    print_error "Error al actualizar los archivos de deployment"
     exit 1
 fi
 
-# 3. Commit y push
-print_info "Paso 3/3: Haciendo commit y push a GitHub..."
+# 4. Commit y tag
+print_info "Paso 4/5: Haciendo commit y tag v${NEW_VERSION}..."
 
-git add "$VERSION_FILE" "$DEPLOYMENT_FILE"
+git add "$VERSION_FILE" "$DEPLOYMENT_FILE" "$BACKEND_DEPLOYMENT_FILE"
 git commit -m "release: v${NEW_VERSION} - ${COMMIT_MESSAGE}
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
+git tag -a "v${NEW_VERSION}" -m "Release v${NEW_VERSION} - ${COMMIT_MESSAGE}"
+
+# 5. Push
+print_info "Paso 5/5: Haciendo push a GitHub (main y tags)..."
+
 git push origin main
+git push origin --tags
 
 if [ $? -eq 0 ]; then
     echo ""
@@ -156,19 +162,12 @@ if [ $? -eq 0 ]; then
     print_success "✅ Release v${NEW_VERSION} iniciado!"
     print_success "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    print_info "📦 Imagen: ghcr.io/n0rthr3nd/${IMAGE_NAME}:v${NEW_VERSION}"
-    print_info "🔄 Commit: $(git rev-parse --short HEAD)"
-    print_info "📝 Mensaje: ${COMMIT_MESSAGE}"
+    print_info "📦 Frontend: ghcr.io/${REGISTRY_USER}/${FRONTEND_IMAGE}:v${NEW_VERSION}"
+    print_info "📦 Backend:  ghcr.io/${REGISTRY_USER}/${BACKEND_IMAGE}:v${NEW_VERSION}"
+    print_info "🏷️  Tag: v${NEW_VERSION}"
     echo ""
-    print_warning "⏳ GitHub Actions está construyendo la imagen..."
-    print_warning "   Esto tomará ~5-6 minutos"
-    echo ""
-    print_info "📊 Monitorear el progreso:"
-    print_info "   GitHub Actions: https://github.com/n0rthr3nd/home-manager/actions"
-    print_info "   ArgoCD: https://northr3nd.duckdns.org/argocd"
-    echo ""
-    print_info "🔍 Ver estado local:"
-    print_info "   kubectl get pods -l app=blinds-control-app -w"
+    print_warning "⏳ GitHub Actions está construyendo las imágenes..."
+    print_info "📊 ArgoCD: https://northr3nd.duckdns.org/argocd"
     echo ""
     print_success "🚀 ¡El despliegue se completará automáticamente!"
 else

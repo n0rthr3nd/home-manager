@@ -3,16 +3,18 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/home-manager
-  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/home-manager-backend
+  FRONTEND_IMAGE: ghcr.io/n0rthr3nd/home-manager
+  BACKEND_IMAGE: ghcr.io/n0rthr3nd/home-manager-backend
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: github.event_name != 'push' || github.ref_type != 'branch' || !contains(github.event.head_commit.message, 'release:')
     steps:
       - uses: actions/checkout@v4
       
@@ -63,6 +65,7 @@ jobs:
           tags: |
             type=sha,format=long
             type=ref,event=branch
+            type=ref,event=tag
             latest
 
       - name: Build and push Frontend
@@ -85,6 +88,7 @@ jobs:
           tags: |
             type=sha,format=long
             type=ref,event=branch
+            type=ref,event=tag
             latest
 
       - name: Build and push Backend
@@ -120,6 +124,6 @@ jobs:
             -H "Authorization: Bearer ${ARGOCD_TOKEN}" \
             -H "Content-Type: application/json" \
             "${ARGOCD_SERVER}/api/v1/applications/home-manager/sync" \
-            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}' || echo "ArgoCD API no disponible, el Image Updater se encargará de la sincronización."
+            -d '{"prune":false,"dryRun":false,"strategy":{"hook":{"force":true}}}' || echo "ArgoCD API no disponible."
           
           echo "Paso de despliegue finalizado."

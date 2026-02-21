@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: blinds-backend
-        image: ghcr.io/n0rthr3nd/home-manager-backend:latest
+        image: ghcr.io/n0rthr3nd/home-manager-backend:v1.0.0
         imagePullPolicy: Always
         ports:
         - containerPort: 3000

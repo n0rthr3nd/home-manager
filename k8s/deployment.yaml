@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: blinds-control
-        image: ghcr.io/n0rthr3nd/home-manager:latest
+        image: ghcr.io/n0rthr3nd/home-manager:v1.0.0
         imagePullPolicy: Always
         ports:
         - containerPort: 80
