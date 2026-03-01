@@ -17,6 +17,7 @@
 /* ===== Card Header ===== */
 .card-header {
   display: flex;
+  zoom: .7;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
@@ -140,6 +141,7 @@
 
 /* ===== Progress Bar ===== */
 .progress-wrap {
+  display: none;
   margin-bottom: 20px;
   padding: 0 4px;
 }
@@ -204,6 +206,7 @@
   }
 
   .ctrl-label {
+    display: none;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
