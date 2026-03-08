@@ -53,16 +53,28 @@ app.get('/health', (_req, res) => {
 
 // ---------------------------------------------------------------------------
 // Proxy endpoint: GET /api/devices/:deviceId/command/:command
+//
+// Acepta comandos semánticos: 'up', 'down', 'stop'
+// Query param opcional: ?inverted=true  → invierte on/off para ese dispositivo
+//
+// Mapeo de comandos semánticos → Z-Way:
+//   up   (normal)   → on
+//   up   (inverted) → off
+//   down (normal)   → off
+//   down (inverted) → on
+//   stop            → stop  (sin inversión)
+//
 // Construye la llamada real hacia Z-Way:
-//   {ZWAY_PROTOCOL}://{ZWAY_HOST}:{ZWAY_PORT}/ZAutomation/api/v1/devices/{deviceId}/command/{command}
+//   {ZWAY_PROTOCOL}://{ZWAY_HOST}:{ZWAY_PORT}/ZAutomation/api/v1/devices/{deviceId}/command/{zwayCommand}
 // ---------------------------------------------------------------------------
 app.get('/api/devices/:deviceId/command/:command', (req, res) => {
   const { deviceId, command } = req.params;
+  const inverted = req.query.inverted === 'true';
 
-  // Validar comando permitido
-  const allowedCommands = ['on', 'off', 'stop'];
+  // Validar comando semántico permitido
+  const allowedCommands = ['up', 'down', 'stop'];
   if (!allowedCommands.includes(command)) {
-    return res.status(400).json({ error: `Comando no permitido: ${command}` });
+    return res.status(400).json({ error: `Comando no permitido: ${command}. Usa: up, down, stop` });
   }
 
   // Validar formato basico del deviceId
@@ -70,7 +82,19 @@ app.get('/api/devices/:deviceId/command/:command', (req, res) => {
     return res.status(400).json({ error: 'deviceId es requerido' });
   }
 
-  const zwayPath = `/ZAutomation/api/v1/devices/${encodeURIComponent(deviceId)}/command/${encodeURIComponent(command)}`;
+  // Resolver comando Z-Way aplicando lógica de inversión en el backend
+  let zwayCommand;
+  if (command === 'stop') {
+    zwayCommand = 'stop';
+  } else if (command === 'up') {
+    zwayCommand = inverted ? 'off' : 'on';
+  } else if (command === 'down') {
+    zwayCommand = inverted ? 'on' : 'off';
+  }
+
+  console.log(`[proxy] Comando semántico '${command}' (inverted=${inverted}) → Z-Way '${zwayCommand}' para dispositivo '${deviceId}'`);
+
+  const zwayPath = `/ZAutomation/api/v1/devices/${encodeURIComponent(deviceId)}/command/${encodeURIComponent(zwayCommand)}`;
   const zwayUrl = `${ZWAY_PROTOCOL}://${ZWAY_HOST}:${ZWAY_PORT}${zwayPath}`;
 
   console.log(`[proxy] -> ${req.method} ${zwayUrl}`);

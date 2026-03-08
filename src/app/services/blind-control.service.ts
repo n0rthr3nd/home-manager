@@ -45,22 +45,22 @@ export class BlindControlService {
   }
 
   /**
-   * Move blind up - Envía comando 'on' a la API (o 'off' si inverted=true)
-   * API: ${API_URL}/api/devices/${deviceId}/command/on
+   * Move blind up - Envía comando semántico 'up' al backend
+   * El backend aplica la inversión si inverted=true
+   * API: ${API_URL}/api/devices/${deviceId}/command/up[?inverted=true]
    */
   moveUp(deviceId: string, inverted: boolean = false): void {
-    const command = inverted ? 'off' : 'on';
     console.log(`📤 Subiendo persiana: ${deviceId} ${inverted ? '(invertido)' : ''}`);
     this.updateStatus(deviceId, { status: 'UP' });
 
     if (this.mode === 'api') {
-      this.sendCommand(deviceId, command).subscribe({
+      this.sendCommand(deviceId, 'up', inverted).subscribe({
         next: () => {
-          console.log(`✅ Comando '${command}' enviado exitosamente a ${deviceId}`);
+          console.log(`✅ Comando 'up' enviado exitosamente a ${deviceId}`);
           this.simulateMovement(deviceId, 'UP');
         },
         error: (error) => {
-          console.error(`❌ Error enviando comando '${command}' a ${deviceId}:`, error);
+          console.error(`❌ Error enviando comando 'up' a ${deviceId}:`, error);
           // En caso de error, seguimos con la simulación local
           this.simulateMovement(deviceId, 'UP');
         }
@@ -71,22 +71,22 @@ export class BlindControlService {
   }
 
   /**
-   * Move blind down - Envía comando 'off' a la API (o 'on' si inverted=true)
-   * API: ${API_URL}/api/devices/${deviceId}/command/off
+   * Move blind down - Envía comando semántico 'down' al backend
+   * El backend aplica la inversión si inverted=true
+   * API: ${API_URL}/api/devices/${deviceId}/command/down[?inverted=true]
    */
   moveDown(deviceId: string, inverted: boolean = false): void {
-    const command = inverted ? 'on' : 'off';
     console.log(`📤 Bajando persiana: ${deviceId} ${inverted ? '(invertido)' : ''}`);
     this.updateStatus(deviceId, { status: 'DOWN' });
 
     if (this.mode === 'api') {
-      this.sendCommand(deviceId, command).subscribe({
+      this.sendCommand(deviceId, 'down', inverted).subscribe({
         next: () => {
-          console.log(`✅ Comando '${command}' enviado exitosamente a ${deviceId}`);
+          console.log(`✅ Comando 'down' enviado exitosamente a ${deviceId}`);
           this.simulateMovement(deviceId, 'DOWN');
         },
         error: (error) => {
-          console.error(`❌ Error enviando comando '${command}' a ${deviceId}:`, error);
+          console.error(`❌ Error enviando comando 'down' a ${deviceId}:`, error);
           // En caso de error, seguimos con la simulación local
           this.simulateMovement(deviceId, 'DOWN');
         }
@@ -117,11 +117,13 @@ export class BlindControlService {
   }
 
   /**
-   * Envía un comando a la API del dispositivo
-   * Formato: ${API_URL}/api/devices/${deviceId}/command/${command}
+   * Envía un comando semántico al backend
+   * Formato: ${API_URL}/api/devices/${deviceId}/command/${command}[?inverted=true]
+   * El backend resuelve la inversión y mapea a on/off/stop antes de llamar a Z-Way
    */
-  private sendCommand(deviceId: string, command: 'on' | 'off' | 'stop'): Observable<any> {
-    const url = `${this.apiUrl}/api/devices/${deviceId}/command/${command}`;
+  private sendCommand(deviceId: string, command: 'up' | 'down' | 'stop', inverted: boolean = false): Observable<any> {
+    const invertedParam = inverted ? '?inverted=true' : '';
+    const url = `${this.apiUrl}/api/devices/${deviceId}/command/${command}${invertedParam}`;
     console.log(`🌐 Llamando API: ${url}`);
 
     return this.http.get(url, {}).pipe(
