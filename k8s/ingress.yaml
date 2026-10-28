@@ -12,6 +12,9 @@ spec:
   - hosts:
     - northr3nd.duckdns.org
     secretName: northr3nd-tls-cert
+  - hosts:
+    - northrend.dev
+    secretName: home-manager-northrend-tls
   rules:
   - host: northr3nd.duckdns.org
     http:
@@ -25,6 +28,24 @@ spec:
             port:
               number: 3000
       # Ruta para la aplicación web (blinds control)
+      - path: /blinds-control
+        pathType: Prefix
+        backend:
+          service:
+            name: blinds-control-service
+            port:
+              number: 80
+  # Dominio nuevo, en paralelo al de DuckDNS hasta que este se retire.
+  - host: northrend.dev
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: blinds-backend-service
+            port:
+              number: 3000
       - path: /blinds-control
         pathType: Prefix
         backend:
